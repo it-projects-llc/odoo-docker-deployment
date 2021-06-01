@@ -1,0 +1,49 @@
+version: '3.7'
+
+x-default:
+  &default-odoo
+  tty: true
+  build: .
+  volumes:
+    - odoo-web-data:/var/lib/odoo
+    #- odoo-backups:/odoo/backups
+    - ./backups:/odoo/backups
+    - ./odoo.conf:/etc/odoo/odoo.conf
+    - ./vendor:/mnt/vendor
+
+services:
+  web:
+    << : *default-odoo
+    depends_on:
+      - db
+      - longpolling
+    ports:
+      - "8069:8069"
+
+  longpolling:
+    << : *default-odoo
+    depends_on:
+      - db
+    command: ['odoo', 'gevent']
+    ports:
+      - "8072:8072"
+
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=odoo
+      - POSTGRES_USER=odoo
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - odoo-db-data:/var/lib/postgresql/data/pgdata
+
+volumes:
+  odoo-web-data:
+  odoo-db-data:
+#  odoo-backups:
+#    driver: local
+#    driver_opts:
+#      type: none
+#      o: bind
+#      device: /opt/work/git/my/odoo-docker-deployment/backups
