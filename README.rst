@@ -8,9 +8,6 @@
 - Устанавливаем git.
   Обычно через команду ``sudo apt-get install git``.
 
-- Редактируем ``nginx.conf``.
-  Напротив server_name перечисляем через домены, которые будут использоваться
-
 - Редактируем ``Dockerfile``.
   Поправляем версию Odoo, если требуется.
 
@@ -20,6 +17,8 @@
 
    export ODOO_VERSION=14.0  # Используем его для выполнения каких-либо команд данной инструкции.
    export ODOO_DATABASE=mycompany  # название базы, в котором все будем устанавливать
+   export ODOO_PORT=8069  # порт, на котором будет запущен odoo
+   export LONGPOLLING_PORT=8072  # порт, на котором будет запущен longpolling
 
 - Выставляем владельца на каталог backups:
 
@@ -27,13 +26,14 @@
 
    sudo chown 101:101 backups
 
-- В каталоге ``vendor`` клонируем репозитории с модулями.
-  Среди обязательных это репозиторий с auto_backup.
+- Генерируем конфиг-файлы (nginx.conf и docker-compose.yml):
 
 .. code-block:: sh
 
-   cd vendor
-   git clone https://github.com/Yenthe666/auto_backup.git -b $ODOO_VERSION --single-branch
+   ./make_config.py
+
+- Редактируем ``nginx.conf``.
+  Напротив server_name перечисляем через домены, которые будут использоваться
 
 - Редактируем ``odoo.conf``.
   Выставляем нужные параметры.
@@ -44,6 +44,14 @@
 
   - ``admin_password``.
     Оставлять стандартным не рекомендую.
+
+- В каталоге ``vendor`` клонируем репозитории с модулями.
+  Среди обязательных это репозиторий с auto_backup.
+
+.. code-block:: sh
+
+   cd vendor
+   git clone https://github.com/Yenthe666/auto_backup.git -b $ODOO_VERSION --single-branch
 
 Установка docker и docker-compose
 ---------------------------------

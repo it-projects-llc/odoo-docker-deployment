@@ -1,2 +1,4 @@
 vendor/
 backups/
+nginx.conf
+docker-compose.yml
