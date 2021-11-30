@@ -77,7 +77,7 @@
 
 .. code-block:: sh
 
-   sudo apt-get install certbot
+   sudo apt-get install certbot python3-certbot-nginx
 
 Настройка nginx
 ---------------
