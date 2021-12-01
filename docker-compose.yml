@@ -1,0 +1,43 @@
+version: '3.7'
+
+x-default14:
+  &default-odoo14
+  tty: true
+  build:
+    context: ./configs/14.0
+  volumes:
+    - odoo14-web-data:/var/lib/odoo
+    - ./configs/14.0/odoo.conf:/etc/odoo/odoo.conf
+    - ./vendor/14.0:/mnt/vendor
+    - ./.adminpasswd:/run/secrets/adminpasswd
+
+services:
+  web14:
+    << : *default-odoo14
+    depends_on:
+      - db
+      - longpolling14
+    ports:
+      - "14169:8069"
+
+  longpolling14:
+    << : *default-odoo14
+    depends_on:
+      - db
+    command: ['odoo', 'gevent']
+    ports:
+      - "14172:8072"
+
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=odoo
+      - POSTGRES_USER=odoo
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - odoo-db-data:/var/lib/postgresql/data/pgdata
+
+volumes:
+  odoo14-web-data:
+  odoo-db-data:
