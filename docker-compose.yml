@@ -18,7 +18,7 @@ services:
       - db
       - longpolling14
     ports:
-      - "14169:8069"
+      - "14069:8069"
 
   longpolling14:
     << : *default-odoo14
@@ -26,7 +26,7 @@ services:
       - db
     command: ['odoo', 'gevent']
     ports:
-      - "14172:8072"
+      - "14072:8072"
 
   db:
     image: postgres:13
