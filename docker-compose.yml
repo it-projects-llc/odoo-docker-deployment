@@ -41,8 +41,6 @@ services:
       - longpolling11
     ports:
       - "11069:8069"
-    extra_hosts:
-      - "chrome:host-gateway"
 
   longpolling11:
     << : *default-odoo11
