@@ -11,7 +11,34 @@ x-default14:
     - ./vendor/14.0:/mnt/vendor
     - ./.adminpasswd:/run/secrets/adminpasswd
 
+x-default13:
+  &default-odoo13
+  tty: true
+  build:
+    context: ./configs/13.0
+  volumes:
+    - odoo13-web-data:/var/lib/odoo
+    - ./configs/13.0/odoo.conf:/etc/odoo/odoo.conf
+    - ./vendor/13.0:/mnt/vendor
+    - ./.adminpasswd:/run/secrets/adminpasswd
+
 services:
+  web13:
+    << : *default-odoo13
+    depends_on:
+      - db
+      - longpolling13
+    ports:
+      - "13069:8069"
+
+  longpolling13:
+    << : *default-odoo13
+    depends_on:
+      - db
+    command: ['odoo', 'gevent']
+    ports:
+      - "13072:8072"
+
   web14:
     << : *default-odoo14
     depends_on:
@@ -39,5 +66,6 @@ services:
       - odoo-db-data:/var/lib/postgresql/data/pgdata
 
 volumes:
+  odoo13-web-data:
   odoo14-web-data:
   odoo-db-data:
