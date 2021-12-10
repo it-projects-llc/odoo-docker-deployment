@@ -86,8 +86,8 @@
 
 .. code-block:: sh
 
-   sudo cp ./nginx.conf /etc/nginx/sites-available/odoo.conf
-   sudo ln -s /etc/nginx/sites-available/odoo.conf /etc/nginx/sites-enabled/odoo.conf
+   sudo cp ./nginx.conf /etc/nginx/sites-available/nginx_odoo.conf
+   sudo ln -s /etc/nginx/sites-available/nginx_odoo.conf /etc/nginx/sites-enabled/nginx_odoo.conf
 
 Убеждаемся, что все правильно настроили:
 
