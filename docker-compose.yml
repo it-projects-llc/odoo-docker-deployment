@@ -1,6 +1,16 @@
 version: '3.7'
 
 x-default14:
+  &default-odoo15
+  tty: true
+  build:
+    context: ./configs/15.0
+  volumes:
+    - odoo15-web-data:/var/lib/odoo
+    - ./configs/15.0/odoo.conf:/etc/odoo/odoo.conf
+    - ./vendor/15.0:/mnt/vendor
+    - ./.adminpasswd:/run/secrets/adminpasswd
+
   &default-odoo14
   tty: true
   build:
@@ -82,6 +92,21 @@ services:
     ports:
       - "14072:8072"
 
+  web15:
+    << : *default-odoo15
+    depends_on:
+      - db
+      - longpolling15
+    ports:
+      - "15069:8069"
+
+  longpolling15:
+    << : *default-odoo15
+    depends_on:
+      - db
+    command: ['odoo', 'gevent']
+    ports:
+      - "15072:8072"
   db:
     image: postgres:13
     environment:
@@ -96,4 +121,5 @@ volumes:
   odoo11-web-data:
   odoo13-web-data:
   odoo14-web-data:
+  odoo15-web-data:
   odoo-db-data:
