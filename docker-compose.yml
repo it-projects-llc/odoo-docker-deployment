@@ -1,6 +1,6 @@
 version: '3.7'
 
-x-default14:
+x-default15:
   &default-odoo15
   tty: true
   build:
@@ -11,6 +11,7 @@ x-default14:
     - ./vendor/15.0:/mnt/vendor
     - ./.adminpasswd:/run/secrets/adminpasswd
 
+x-default14:
   &default-odoo14
   tty: true
   build:
