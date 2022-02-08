@@ -32,6 +32,17 @@ x-default13:
     - ./vendor/13.0:/mnt/vendor
     - ./.adminpasswd:/run/secrets/adminpasswd
 
+x-default13e:
+  &default-odoo13e
+  tty: true
+  build:
+    context: ./configs/13.0e
+  volumes:
+    - odoo13-web-data:/var/lib/odoo
+    - ./configs/13.0e/odoo.conf:/etc/odoo/odoo.conf
+    - ./vendor/13.0:/mnt/vendor
+    - ./.adminpasswd:/run/secrets/adminpasswd
+
 x-default11:
   &default-odoo11
   tty: true
@@ -75,6 +86,22 @@ services:
     command: ['odoo', 'gevent']
     ports:
       - "13072:8072"
+
+  web13e:
+    << : *default-odoo13e
+    depends_on:
+      - db
+      - longpolling13
+    ports:
+      - "23069:8069"
+
+  longpolling13e:
+    << : *default-odoo13e
+    depends_on:
+      - db
+    command: ['odoo', 'gevent']
+    ports:
+      - "23072:8072"
 
   web14:
     << : *default-odoo14
