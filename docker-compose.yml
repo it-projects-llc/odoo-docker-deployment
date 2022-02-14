@@ -92,7 +92,7 @@ services:
     << : *default-odoo13e
     depends_on:
       - db
-      - longpolling13
+      - longpolling13e
     ports:
       - "23069:8069"
 
