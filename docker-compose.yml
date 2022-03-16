@@ -123,6 +123,22 @@ services:
     ports:
       - "23069:8069"
 
+  web13edebug:
+    << : *default-odoo13e
+    build:
+      context: ./configs/13.0e
+      dockerfile: Dockerfile.debug
+    depends_on:
+      - db
+      - longpolling13e
+      - wdb
+    ports:
+      - "23069:8069"
+    environment:
+      - WDB_SOCKET_SERVER=wdb
+      - WDB_NO_BROWSER_AUTO_OPEN=True
+    command: ['--dev', 'reload']
+
   longpolling13e:
     << : *default-odoo13e
     depends_on:
@@ -138,6 +154,8 @@ services:
       - longpolling14
     ports:
       - "14069:8069"
+    environment:
+      - ALL_PROXY=socks5://172.17.0.1:3128
 
   longpolling14:
     << : *default-odoo14
@@ -171,6 +189,13 @@ services:
       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
       - odoo-db-data:/var/lib/postgresql/data/pgdata
+    ports:
+      - "5433:5432"
+
+  wdb:
+    image: kozea/wdb:3.3.0
+    ports:
+      - "127.0.0.1:1984:1984"
 
 volumes:
   odoo11-web-data:
