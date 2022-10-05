@@ -5,6 +5,8 @@ RUN apt-get update
 RUN apt-get install -y build-essential libssl-dev libffi-dev python3-dev cargo
 RUN python3 -m pip install pip --upgrade
 RUN python3 -m pip install pycountry
+RUN apt-get install libcairo2 -y
+RUN python3 -m pip install cairosvg
 # RUN python3 -m pip install pysftp
 # RUN python3 -m pip install viberbot
 # RUN python3 -m pip install python-telegram-bot

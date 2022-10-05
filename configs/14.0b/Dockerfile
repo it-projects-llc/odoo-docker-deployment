@@ -11,6 +11,4 @@ RUN python3 -m pip install pysocks
 COPY ./adminpwd.patch /tmp/adminpwd.patch
 RUN patch -p1 -d /usr/lib/python3/dist-packages -i /tmp/adminpwd.patch
 
-RUN echo "127.0.0.1 services.openerp.com > /etc/hosts"
-
 USER odoo
