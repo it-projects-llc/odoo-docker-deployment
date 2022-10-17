@@ -1,37 +1,30 @@
-FROM debian:stretch-slim
-MAINTAINER Odoo S.A. <info@odoo.com>
+FROM python:3.6-slim-stretch
+MAINTAINER Eugene Molotov <molotov@it-projects.info>
 
 SHELL ["/bin/bash", "-xo", "pipefail", "-c"]
 
 # Generate locale C.UTF-8 for postgres and general locale data
 ENV LANG C.UTF-8
 
-# Use backports to avoid install some libs with pip
-RUN echo 'deb http://deb.debian.org/debian stretch-backports main' > /etc/apt/sources.list.d/backports.list
-
 # Install some deps, lessc and less-plugin-clean-css, and wkhtmltopdf
 RUN apt-get update \
         && apt-get install -y --no-install-recommends \
+            build-essential \
             ca-certificates \
             curl \
             dirmngr \
             fonts-noto-cjk \
             gnupg \
+            libffi-dev \
+            libldap2-dev \
+            libpq-dev \
+            libsasl2-dev \
             libssl1.0-dev \
+            libxml2-dev \
+            libxslt1-dev \
             node-less \
-            python3-num2words \
-            python3-pip \
-            python3-phonenumbers \
-            python3-pyldap \
-            python3-qrcode \
-            python3-renderpm \
-            python3-setuptools \
-            python3-slugify \
-            python3-vobject \
-            python3-watchdog \
-            python3-xlrd \
-            python3-xlwt \
             xz-utils \
+            zlib1g-dev \
         && curl -o wkhtmltox.deb -sSL https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.stretch_amd64.deb \
         && echo '7e35a63f9db14f93ec7feeb0fce76b30c08f2057 wkhtmltox.deb' | sha1sum -c - \
         && apt-get install -y --no-install-recommends ./wkhtmltox.deb \
@@ -65,15 +58,24 @@ RUN echo "deb http://deb.nodesource.com/node_8.x stretch main" > /etc/apt/source
     && npm install -g rtlcss \
     && rm -rf /var/lib/apt/lists/*
 
+RUN curl -o requirements.txt https://raw.githubusercontent.com/odoo/odoo/12.0/requirements.txt \
+    && python3 -m pip install -r requirements.txt \
+    && rm requirements.txt
+
 # Install Odoo
 ENV ODOO_VERSION 12.0
-ARG ODOO_RELEASE=20211006
-ARG ODOO_SHA=f32dcd82b04e9a93e17a7d4b3ab471dc20408253
-RUN curl -o odoo.deb -sSL http://nightly.odoo.com/${ODOO_VERSION}/nightly/deb/odoo_${ODOO_VERSION}.${ODOO_RELEASE}_all.deb \
-        && echo "${ODOO_SHA} odoo.deb" | sha1sum -c - \
-        && apt-get update \
-        && apt-get -y install --no-install-recommends ./odoo.deb \
-        && rm -rf /var/lib/apt/lists/* odoo.deb
+ARG ODOO_RELEASE=20211011
+ARG ODOO_SHA=8f4e843b5acc267a7a7d0a38560eeb84ddf83ba8
+RUN curl -o odoo.tar.xz -sSL http://nightly.odoo.com/${ODOO_VERSION}/nightly/deb/odoo_${ODOO_VERSION}.${ODOO_RELEASE}.tar.xz \
+        && echo "${ODOO_SHA} odoo.tar.xz" | sha1sum -c - \
+        && tar xf odoo.tar.xz \
+        && python3 -m pip install src/ \
+        && rm -rf odoo.tar.xz src/
+
+RUN mkdir /var/lib/odoo && \
+    groupadd odoo && \
+    useradd -g odoo odoo -d /var/lib/odoo && \
+    chown odoo:odoo /var/lib/odoo
 
 # Copy entrypoint script and Odoo configuration file
 COPY ./entrypoint.sh /
