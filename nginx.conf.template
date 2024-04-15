@@ -34,7 +34,7 @@ server {
 
   # odoo 16+
   location /websocket {
-    proxy_pass http://odoochat;
+    proxy_pass http://127.0.0.1:LONGPOLLING_PORT;
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection $connection_upgrade;
     proxy_set_header X-Forwarded-Host $http_host;
