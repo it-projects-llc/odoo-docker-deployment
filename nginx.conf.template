@@ -1,3 +1,8 @@
+map $http_upgrade $connection_upgrade {
+  default upgrade;
+  ''      close;
+}
+
 server {
   listen 80;
   server_name odoo.mycompany.com;
@@ -22,8 +27,22 @@ server {
   }
 
   # Redirect longpoll requests to odoo longpolling port
+  # odoo 15 or less
   location /longpolling {
     proxy_pass http://127.0.0.1:LONGPOLLING_PORT;
+  }
+
+  # odoo 16+
+  location /websocket {
+    proxy_pass http://127.0.0.1:LONGPOLLING_PORT;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection $connection_upgrade;
+    proxy_set_header X-Forwarded-Host $http_host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Real-IP $remote_addr;
+
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains";
   }
 
   # Redirect requests to odoo backend server
